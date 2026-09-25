@@ -62,38 +62,7 @@ jobs:
           mkdir -p "app/src/$FLAVOR"
 
           if [[ "$FLAVOR" == "plus" ]]; then
-            # 直接写入合法的 json 内容，不再依赖 Secret 解码，彻底规避格式错误
-            cat << 'EOF' > "app/src/plus/google-services.json"
-{
-  "project_info": {
-    "project_number": "123456789012",
-    "firebase_url": "https://dummy.firebaseio.com",
-    "project_id": "dummy-project-id",
-    "storage_bucket": "dummy-project-id.appspot.com"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
-        "android_client_info": {
-          "package_name": "com.example.dummy"
-        }
-      },
-      "api_key": [
-        {
-          "current_key": "AIzaSyDummyKeyForTestingPurposesOnly123"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
-}
-EOF
+            echo '{"project_info":{"project_number":"123456789012","firebase_url":"https://dummy.firebaseio.com","project_id":"dummy-project-id","storage_bucket":"dummy-project-id.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:123456789012:android:abcdef1234567890","android_client_info":{"package_name":"com.example.dummy"}},"api_key":[{"current_key":"AIzaSyDummyKeyForTestingPurposesOnly123"}],"services":{"analytics_service":{"status":1}}}],"configuration_version":"1"}' > "app/src/plus/google-services.json"
             test -s "app/src/plus/google-services.json"
           else
             echo "Unknown flavor: $FLAVOR"
