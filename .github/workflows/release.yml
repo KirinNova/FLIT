@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - "[0-9]*"
+  workflow_dispatch:
+    inputs:
+      tag_version:
+        description: 'Tag 版本号 (例如: 1.4.6)'
+        required: true
+        default: '1.4.6'
+        type: string
 
 permissions:
   contents: write
@@ -17,6 +24,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Resolve Version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.tag_version }}" >> "$GITHUB_OUTPUT"
+            echo "Using manual input version: ${{ inputs.tag_version }}"
+          else
+            echo "version=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "Using push tag version: ${{ github.ref_name }}"
+          fi
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -34,7 +52,7 @@ jobs:
           flavor="plus"
 
           echo "flavor=$flavor" >> "$GITHUB_OUTPUT"
-          echo "Detected flavor: $flavor (tag: ${GITHUB_REF_NAME})"
+          echo "Detected flavor: $flavor (version: ${{ steps.version.outputs.version }})"
 
       - name: Prepare build files
         env:
@@ -97,8 +115,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
           generate_release_notes: true
           files: |
             app/build/outputs/apk/${{ steps.flavor.outputs.flavor }}/release/*.apk
