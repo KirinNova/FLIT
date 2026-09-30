@@ -1,4 +1,4 @@
-# Chinese function words
+#  Chinese Function Words 
 的
 了
 吗
@@ -26,7 +26,7 @@
 记得
 但是
 
-# Chinese degree words
+#  Chinese Degree Words 
 很
 太
 挺
@@ -40,7 +40,7 @@
 过于
 格外
 
-# English function words
+#  English Function Words 
 a
 an
 the
