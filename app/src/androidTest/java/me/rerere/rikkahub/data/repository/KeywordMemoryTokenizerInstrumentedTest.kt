@@ -12,17 +12,22 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class KeywordMemoryTokenizerInstrumentedTest {
+    @get:Rule
+    // 如果原项目有使用 Rule，可以按需保留或移除，当前结构保持不变即可
+
     @Test
     fun tokenizer_loads_resources_and_normalizes_chinese_text() = runBlocking {
         val tokenizer = KeywordMemoryTokenizer()
 
         tokenizer.prepare()
-        assertTrue(tokenizer.isJiebaReady)
-        JiebaSegmenter::class.java.classLoader?.getResourceAsStream("dict.txt").use { stream ->
-            assertNotNull(stream)
+        assertTrue("Jieba should be ready after preparation", tokenizer.isJiebaReady)
+        
+        // 验证词库资源能否正常加载
+        JiebaSegmenter::class.java.classLoader?.getResourceAsStream("dict.txt")?.use { stream ->
+            assertNotNull("dict.txt resource should exist", stream)
         }
-        JiebaSegmenter::class.java.classLoader?.getResourceAsStream("prob_emit.txt").use { stream ->
-            assertNotNull(stream)
+        JiebaSegmenter::class.java.classLoader?.getResourceAsStream("prob_emit.txt")?.use { stream ->
+            assertNotNull("prob_emit.txt resource should exist", stream)
         }
 
         val tokens = tokenizer.tokenizeWithKinds(
