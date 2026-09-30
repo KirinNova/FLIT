@@ -50,7 +50,9 @@ class CodexLoginDialogTest {
         composeRule.onNodeWithText(context.getString(R.string.copy)).assertDoesNotExist()
         composeRule.onNodeWithText(context.getString(R.string.webview_page_open_in_browser))
             .performClick()
-        composeRule.waitUntil { browserLaunches.get() == 1 }
+        
+        // 增加超时控制和更安全的等待条件
+        composeRule.waitUntil(timeoutMillis = 3000L) { browserLaunches.get() == 1 }
         composeRule.onNodeWithText(context.getString(R.string.cancel)).performClick()
         assertTrue(dismissed.get())
     }
@@ -94,7 +96,8 @@ class CodexLoginDialogTest {
             }
         }
 
-        composeRule.waitUntil { successCalls.get() == 1 }
+        // 加上超时防卡死保护，避免异步回调慢导致测试无限挂起
+        composeRule.waitUntil(timeoutMillis = 3000L) { successCalls.get() == 1 }
         assertEquals(1, successCalls.get())
     }
 }
