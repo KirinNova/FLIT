@@ -94,8 +94,8 @@ android {
         targetSdk = 36
         // 固定版本号：需高于历史时间戳方案水位（约 343 万），保证可覆盖安装旧包。
         // 以后真正发版时再手动递增。
-        versionCode = 3_500_003
-        versionName = "1.5.3"
+        versionCode = 3_500_004
+        versionName = "1.5.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -185,7 +185,6 @@ android {
             buildConfigField("String", "VERSION_CODE", "\"${android.defaultConfig.versionCode}\"")
         }
         debug {
-
             buildConfigField("String", "VERSION_NAME", "\"${android.defaultConfig.versionName}\"")
             buildConfigField("String", "VERSION_CODE", "\"${android.defaultConfig.versionCode}\"")
         }
@@ -326,12 +325,6 @@ dependencies {
     // Navigation 2
     implementation(libs.androidx.navigation2)
 
-    // Navigation 3
-//    implementation(libs.androidx.navigation3.runtime)
-//    implementation(libs.androidx.navigation3.ui)
-//    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-//    implementation(libs.androidx.material3.adaptive.navigation3)
-
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
@@ -342,7 +335,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     // Image metadata extractor
-    // https://github.com/drewnoakes/metadata-extractor
     implementation(libs.metadata.extractor)
 
     // koin
@@ -424,10 +416,10 @@ dependencies {
     // Toast (Sonner)
     implementation(libs.sonner)
 
-    // Reorderable (https://github.com/Calvin-LL/Reorderable/)
+    // Reorderable
     implementation(libs.reorderable)
 
-    // Haze (glassmorphism blur for Compose, https://github.com/chrisbanes/haze)
+    // Haze
     implementation(libs.haze)
     implementation(libs.haze.materials)
 
@@ -438,7 +430,6 @@ dependencies {
     implementation(libs.image.viewer)
 
     // JLatexMath
-    // https://github.com/rikkahub/jlatexmath-android
     implementation(libs.jlatexmath)
     implementation(libs.jlatexmath.font.greek)
     implementation(libs.jlatexmath.font.cyrillic)
@@ -459,9 +450,6 @@ dependencies {
     // Glance (Widgets)
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.material3)
-
-    // Leak Canary
-    // debugImplementation(libs.leakcanary.android)
 
     // tests
     testImplementation(libs.junit)
