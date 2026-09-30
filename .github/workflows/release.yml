@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -47,14 +47,15 @@ jobs:
         id: flavor
         run: |
           set -euo pipefail
-
           # zh flavor 已移除，plus 为默认 flavor；标签使用纯版本号（如 1.4.6）。
           flavor="plus"
-
           echo "flavor=$flavor" >> "$GITHUB_OUTPUT"
           echo "Detected flavor: $flavor (version: ${{ steps.version.outputs.version }})"
 
-      - name: Prepare build files
+      - name: Prepare build files and secrets
+        env:
+          KEY_BASE64: ${{ secrets.KEY_BASE64 }}
+          SIGNING_CONFIG: ${{ secrets.SIGNING_CONFIG }}
         run: |
           set -euo pipefail
 
@@ -69,12 +70,12 @@ jobs:
             exit 1
           fi
 
-          if [ -n "${{ secrets.KEY_BASE64 }}" ]; then
-            echo "${{ secrets.KEY_BASE64 }}" | base64 -d > app/app.key
+          if [ -n "$KEY_BASE64" ]; then
+            echo "$KEY_BASE64" | base64 -d > app/app.key
           fi
 
-          if [ -n "${{ secrets.SIGNING_CONFIG }}" ]; then
-            echo "${{ secrets.SIGNING_CONFIG }}" > local.properties
+          if [ -n "$SIGNING_CONFIG" ]; then
+            echo "$SIGNING_CONFIG" > local.properties
           fi
 
       - name: Set up Node.js
@@ -85,7 +86,12 @@ jobs:
           cache-dependency-path: web-ui/package-lock.json
 
       - name: Install Web UI dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
         working-directory: web-ui
 
       - name: Gradle Build Release
@@ -94,11 +100,12 @@ jobs:
           chmod +x gradlew
 
           FLAVOR="${{ steps.flavor.outputs.flavor }}"
-          FLAVOR_CAP="${FLAVOR^}"
+          # 使用更通用的首字母大写转换方式，避免 Bash 版本兼容问题
+          FLAVOR_CAP="$(echo "$FLAVOR" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')"
           TASK="assemble${FLAVOR_CAP}Release"
 
           echo "Building release APK ($TASK)..."
-          ./gradlew ":app:$TASK" --no-daemon --stacktrace
+          ./gradlew ":app:$TASK" --no-daemon --parallel --stacktrace
 
       - name: Upload build output (artifact)
         uses: actions/upload-artifact@v4
